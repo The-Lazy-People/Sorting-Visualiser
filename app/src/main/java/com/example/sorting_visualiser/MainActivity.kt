@@ -2,20 +2,29 @@ package com.example.sorting_visualiser
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
+
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     //array to store all button 2d array
     val button: MutableList<MutableList<Button>> = ArrayList()
     //size of grid
     var size = 5
+    //array to store numbers in array to be sorted
+    var arrayToBeSorted:MutableList<Int> = ArrayList()
+    //white color
+    val whiteColor:String="#FFFFFF"
+    //red color
+    val redColor:String="#FF0000"
+    //green color
+    val greenColor:String="#228B22"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,13 +41,49 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
         //randomize button listener
         randamizebtn.setOnClickListener {
-            paintButtonWhiteAgain(size)
+            paintAllButtonsWhiteAgain(size)
             randamize(size)
 
         }
+        sortbtn.setOnClickListener {
+            bubbleSort()
+        }
     }
+    private fun bubbleSort(){
+        GlobalScope.launch (Dispatchers.Main )
+        {
+            var swap = true
+            while (swap) {
+                swap = false
+                for (i in 0 until arrayToBeSorted.size - 1) {
+                    if (arrayToBeSorted[i] > arrayToBeSorted[i + 1]) {
+                        //delay(100)
+                        replaceTwoColInGrid(i, i + 1)
+                        delay(200)
+                        val temp = arrayToBeSorted[i]
+                        arrayToBeSorted[i] = arrayToBeSorted[i + 1]
+                        arrayToBeSorted[i + 1] = temp
+                        swap = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun replaceTwoColInGrid(a: Int, b: Int) {
+        GlobalScope.launch(Dispatchers.Main) {
+            colorButton(a, arrayToBeSorted[a], redColor)
+            colorButton(b, arrayToBeSorted[b], redColor)
+            delay(100)
+            paintSingleColWhite(a)
+            paintSingleColWhite(b)
+            colorButton(a, arrayToBeSorted[b], greenColor)
+            colorButton(b, arrayToBeSorted[a], greenColor)
+        }
+    }
+
     //make all the buttons white color
-    private fun paintButtonWhiteAgain(size: Int) {
+    private fun paintAllButtonsWhiteAgain(size: Int) {
         for (i in 0..size){
             for (j in 0..size){
                 button[i][j].setBackgroundColor(Color.parseColor("#FFFFFF"))
@@ -47,16 +92,24 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     // fill the array with random numbers
     private fun randamize(size: Int) {
+        arrayToBeSorted.removeAll(arrayToBeSorted)
         for(col in 0..size)
         {
             val row = (0..size).random()
-            colorButton(col,row)
+            arrayToBeSorted.add(row)
+            colorButton(col,row,greenColor)
         }
     }
     // color a coloumn of grid till a specific row
-    private fun colorButton(col: Int, row: Int) {
+    private fun colorButton(col: Int, row: Int,color:String) {
         for (i in 0..row){
-            button[col][i].setBackgroundColor(Color.parseColor("#FF0000"))
+            button[col][i].setBackgroundColor(Color.parseColor(color))
+        }
+    }
+    // make a single coloumn of grid white
+    private fun paintSingleColWhite(col: Int) {
+        for (i in 0..size){
+            button[col][i].setBackgroundColor(Color.parseColor("#FFFFFF"))
         }
     }
     // create grid of size - parameter size
@@ -104,7 +157,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             mainscreen.addView(arrayLinearLayout)
         }
 
-        paintButtonWhiteAgain(size)
+        paintAllButtonsWhiteAgain(size)
 
     }
     //delete the dynamically created mainscreen linearlayout and clear the button array
@@ -123,7 +176,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     //seekbar function
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        paintButtonWhiteAgain(size)
+        paintAllButtonsWhiteAgain(size)
     }
     //seekbar function
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
