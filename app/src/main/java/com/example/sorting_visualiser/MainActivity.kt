@@ -113,7 +113,25 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
 
     private fun selectionSort(){
-
+        GlobalScope.launch (Dispatchers.Main )
+        {
+            var n = arrayToBeSorted.size
+            var temp: Int
+            for (i in 0..n - 1) {
+                var indexOfMin = i
+                for (j in n - 1 downTo i) {
+                    if (arrayToBeSorted[j] < arrayToBeSorted[indexOfMin])
+                        indexOfMin = j
+                }
+                if (i != indexOfMin) {
+                    replaceTwoColInGrid(i, indexOfMin)
+                    delay(200)
+                    temp = arrayToBeSorted[i]
+                    arrayToBeSorted[i] = arrayToBeSorted[indexOfMin]
+                    arrayToBeSorted[indexOfMin] = temp
+                }
+            }
+        }
     }
 
     private fun mergeSort(){
@@ -122,6 +140,20 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
     private fun insertionSort(){
 
+        for (i in 1..size) {
+            // println(items)
+            val item = arrayToBeSorted[i]
+            var j = i-1
+            while (j >= 0 && arrayToBeSorted[j]>item) {
+                paintSingleColWhite(j+1)
+                colorButton(j+1, arrayToBeSorted[j], greenColor)
+                arrayToBeSorted[j+1] = arrayToBeSorted[j]
+                j=j-1
+            }
+            paintSingleColWhite(j+1)
+            colorButton(j+1,item,greenColor)
+            arrayToBeSorted[j+1] = item
+        }
     }
 
     private fun quick_sort(){
