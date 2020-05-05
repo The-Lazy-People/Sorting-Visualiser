@@ -2,6 +2,8 @@ package com.example.sorting_visualiser
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
@@ -29,12 +31,17 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //Toolbar added
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         //seekbar added
         arraySizeSeekBar.setOnSeekBarChangeListener(this)
 
 
         //grid created for first time
         createButtonGrid(size)
+        sortbtn.text = "Bubble Sort"
         //button[0][0].setBackgroundColor(Color.parseColor("#FF0000"))
 
 
@@ -49,7 +56,28 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             bubbleSort()
         }
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.bubble_sort -> { bubbleSort()
+                return true }
+            R.id.selection_sort -> { selectionSort()
+                return true }
+            R.id.merge_sort -> { mergeSort()
+                return true }
+            R.id.insertion_sort -> { insertionSort()
+                return true }
+            R.id.quick_sort -> { quick_sort()
+                return true }
+        }
+        return super.onOptionsItemSelected(item)
+
+    }
+
+
+
     private fun bubbleSort(){
+        sortbtn.text = "Bubble Sort"
         GlobalScope.launch (Dispatchers.Main )
         {
             var swap = true
@@ -68,6 +96,22 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 }
             }
         }
+    }
+
+    private fun selectionSort(){
+        sortbtn.text = "Selection Sort"
+    }
+
+    private fun mergeSort(){
+        sortbtn.text = "Merge Sort"
+    }
+
+    private fun insertionSort(){
+        sortbtn.text = "Insertion Sort"
+    }
+
+    private fun quick_sort(){
+        sortbtn.text = "Quick Sort"
     }
 
     private fun replaceTwoColInGrid(a: Int, b: Int) {
@@ -178,9 +222,16 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
         paintAllButtonsWhiteAgain(size)
     }
+
     //seekbar function
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        //return super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.sorting_name, menu)
+        return true
     }
 
 
