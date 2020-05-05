@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     //array to store all button 2d array
-    val button: MutableList<MutableList<Button>> = ArrayList()
+    val buttons: MutableList<MutableList<Button>> = ArrayList()
     //size of grid
     var size = 5
     //array to store numbers in array to be sorted
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private fun paintAllButtonsWhiteAgain(size: Int) {
         for (i in 0..size){
             for (j in 0..size){
-                button[i][j].setBackgroundColor(Color.parseColor("#FFFFFF"))
+                buttons[i][j].setBackgroundColor(Color.parseColor("#FFFFFF"))
             }
         }
     }
@@ -103,13 +103,13 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     // color a coloumn of grid till a specific row
     private fun colorButton(col: Int, row: Int,color:String) {
         for (i in 0..row){
-            button[col][i].setBackgroundColor(Color.parseColor(color))
+            buttons[col][i].setBackgroundColor(Color.parseColor(color))
         }
     }
     // make a single coloumn of grid white
     private fun paintSingleColWhite(col: Int) {
         for (i in 0..size){
-            button[col][i].setBackgroundColor(Color.parseColor("#FFFFFF"))
+            buttons[col][i].setBackgroundColor(Color.parseColor("#FFFFFF"))
         }
     }
     // create grid of size - parameter size
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 arrayLinearLayout.addView(button)
             }
 
-            button.add(buttoncol)
+            buttons.add(buttoncol)
 
             mainscreen.addView(arrayLinearLayout)
         }
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         var mainscreenid = resources.getIdentifier("mainscreen", "id", packageName)
         val mainscreen=findViewById<LinearLayout>(mainscreenid)
         (mainscreen.getParent() as ViewGroup).removeView(mainscreen)
-        button.removeAll(button)
+        buttons.removeAll(buttons)
     }
     //seekbar function
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
