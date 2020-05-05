@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     val redColor:String="#FF0000"
     //green color
     val greenColor:String="#228B22"
+    // sort val
+    var sortval=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,21 +55,34 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
         }
         sortbtn.setOnClickListener {
-            bubbleSort()
+            when(sortval)
+            {
+                0 -> bubbleSort()
+                1 -> selectionSort()
+                2 -> mergeSort()
+                3 -> insertionSort()
+                4 -> quick_sort()
+
+            }
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.bubble_sort -> { bubbleSort()
+            R.id.bubble_sort -> { sortbtn.text="Bubble Sort"
+                sortval=0
                 return true }
-            R.id.selection_sort -> { selectionSort()
+            R.id.selection_sort -> { sortbtn.text="Selection Sort"
+                sortval=1
                 return true }
-            R.id.merge_sort -> { mergeSort()
+            R.id.merge_sort -> { sortbtn.text="Merge Sort"
+                sortval=2
                 return true }
-            R.id.insertion_sort -> { insertionSort()
+            R.id.insertion_sort -> { sortbtn.text="Insertion Sort"
+                sortval=3
                 return true }
-            R.id.quick_sort -> { quick_sort()
+            R.id.quick_sort -> { sortbtn.text="Quick Sort"
+                sortval=4
                 return true }
         }
         return super.onOptionsItemSelected(item)
@@ -77,7 +92,6 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
 
     private fun bubbleSort(){
-        sortbtn.text = "Bubble Sort"
         GlobalScope.launch (Dispatchers.Main )
         {
             var swap = true
@@ -99,19 +113,19 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
 
     private fun selectionSort(){
-        sortbtn.text = "Selection Sort"
+
     }
 
     private fun mergeSort(){
-        sortbtn.text = "Merge Sort"
+
     }
 
     private fun insertionSort(){
-        sortbtn.text = "Insertion Sort"
+
     }
 
     private fun quick_sort(){
-        sortbtn.text = "Quick Sort"
+
     }
 
     private fun replaceTwoColInGrid(a: Int, b: Int) {
