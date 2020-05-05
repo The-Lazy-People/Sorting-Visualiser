@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             randamize(size)
 
         }
+        //sortbtn listener
         sortbtn.setOnClickListener {
             when(sortval)
             {
@@ -61,12 +62,12 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 1 -> selectionSort()
                 2 -> mergeSort()
                 3 -> insertionSort()
-                4 -> quick_sort()
+                4 -> quicksort(arrayToBeSorted,0,size)
 
             }
         }
     }
-
+    // Menu toolbar component
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.bubble_sort -> { sortbtn.text="Bubble Sort"
@@ -86,11 +87,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 return true }
         }
         return super.onOptionsItemSelected(item)
-
     }
-
-
-
+    //bubble sort
     private fun bubbleSort(){
         GlobalScope.launch (Dispatchers.Main )
         {
@@ -111,7 +109,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             }
         }
     }
-
+    //selection sort
     private fun selectionSort(){
         GlobalScope.launch (Dispatchers.Main )
         {
@@ -125,7 +123,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 }
                 if (i != indexOfMin) {
                     replaceTwoColInGrid(i, indexOfMin)
-                    delay(200)
+                    delay(400)
                     temp = arrayToBeSorted[i]
                     arrayToBeSorted[i] = arrayToBeSorted[indexOfMin]
                     arrayToBeSorted[indexOfMin] = temp
@@ -133,43 +131,77 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             }
         }
     }
-
+    //merge sort
     private fun mergeSort(){
 
     }
-
+    //insertion sort
     private fun insertionSort(){
-
-        for (i in 1..size) {
-            // println(items)
-            val item = arrayToBeSorted[i]
-            var j = i-1
-            while (j >= 0 && arrayToBeSorted[j]>item) {
-                paintSingleColWhite(j+1)
-                colorButton(j+1, arrayToBeSorted[j], greenColor)
-                arrayToBeSorted[j+1] = arrayToBeSorted[j]
-                j=j-1
+        GlobalScope.launch (Dispatchers.Main )
+        {
+            for (i in 1..size) {
+                // println(items)
+                val item = arrayToBeSorted[i]
+                var j = i - 1
+                while (j >= 0 && arrayToBeSorted[j] > item) {
+                    colorButton(j+1,arrayToBeSorted[j+1],redColor)
+                    delay(100)
+                    paintSingleColWhite(j + 1)
+                    colorButton(j + 1, arrayToBeSorted[j], greenColor)
+                    arrayToBeSorted[j + 1] = arrayToBeSorted[j]
+                    j = j - 1
+                }
+                colorButton(j+1,arrayToBeSorted[j+1],redColor)
+                delay(100)
+                paintSingleColWhite(j + 1)
+                colorButton(j + 1, item, greenColor)
+                arrayToBeSorted[j + 1] = item
             }
-            paintSingleColWhite(j+1)
-            colorButton(j+1,item,greenColor)
-            arrayToBeSorted[j+1] = item
         }
     }
-
-    private fun quick_sort(){
-
-    }
-
-    private fun replaceTwoColInGrid(a: Int, b: Int) {
+    //quick sort
+    private fun quicksort(A: MutableList<Int>, p: Int, r: Int) {
         GlobalScope.launch(Dispatchers.Main) {
+            if (p < r) {
+                var q: Int = partition(A, p, r)
+                quicksort(A, p, q - 1)
+                quicksort(A, q + 1, r)
+
+            }
+        }
+    }
+    //quick sort component
+    suspend fun partition(A: MutableList<Int>, p: Int, r: Int): Int {
+        var x = A[r]
+        var i = p - 1
+        for (j in p until r) {
+            if (A[j] <= x) {
+                i++
+                exchange(A, i, j)
+            }
+        }
+        exchange(A, i + 1, r)
+        return i + 1
+    }
+    //quick sort component
+    suspend fun exchange(A: MutableList<Int>, i: Int, j: Int) {
+        replaceTwoColInGrid(i,j)
+        var temp = A[i]
+        A[i] = A[j]
+        A[j] = temp
+    }
+    // replaces 2 coloumn in the grid
+    private suspend fun replaceTwoColInGrid(a: Int, b: Int) {
+       val job=GlobalScope.launch(Dispatchers.Main) {
             colorButton(a, arrayToBeSorted[a], redColor)
             colorButton(b, arrayToBeSorted[b], redColor)
-            delay(100)
+            delay(200)
             paintSingleColWhite(a)
             paintSingleColWhite(b)
             colorButton(a, arrayToBeSorted[b], greenColor)
             colorButton(b, arrayToBeSorted[a], greenColor)
-        }
+       }
+        job.join()
     }
 
     //make all the buttons white color
@@ -273,7 +305,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
 
     }
-
+    //Menu Toolbar Component
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         //return super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.sorting_name, menu)
