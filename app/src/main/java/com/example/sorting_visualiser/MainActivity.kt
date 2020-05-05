@@ -2,6 +2,7 @@ package com.example.sorting_visualiser
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -28,10 +29,19 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     val greenColor:String="#228B22"
     // sort val
     var sortval=0
+    lateinit var jobBubbleSort:Job
+    lateinit var jobInsertionSort:Job
+    lateinit var jobQuickSort1:Job
+    lateinit var jobQuickSort2:Job
+    lateinit var jobQuickSort3:Job
+    lateinit var jobSelectionSort:Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //false job initiazation
+        falseJobInit()
 
         //Toolbar added
         setSupportActionBar(toolbar)
@@ -50,12 +60,15 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
         //randomize button listener
         randamizebtn.setOnClickListener {
+            cancelAllJobs()
             paintAllButtonsWhiteAgain(size)
             randamize(size)
 
         }
         //sortbtn listener
         sortbtn.setOnClickListener {
+            cancelAllJobs()
+
             when(sortval)
             {
                 0 -> bubbleSort()
@@ -63,10 +76,29 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
                 2 -> mergeSort()
                 3 -> insertionSort()
                 4 -> quicksort(arrayToBeSorted,0,size)
-
             }
+
         }
     }
+
+    private fun falseJobInit() {
+        jobSelectionSort=GlobalScope.launch {  }
+        jobQuickSort1=GlobalScope.launch {  }
+        jobQuickSort2=GlobalScope.launch {  }
+        jobQuickSort3=GlobalScope.launch {  }
+        jobInsertionSort=GlobalScope.launch {  }
+        jobBubbleSort=GlobalScope.launch {  }
+    }
+
+    private fun cancelAllJobs() {
+        jobBubbleSort.cancel()
+        jobInsertionSort.cancel()
+        jobQuickSort1.cancel()
+        jobQuickSort2.cancel()
+        jobQuickSort3.cancel()
+        jobSelectionSort.cancel()
+    }
+
     // Menu toolbar component
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
@@ -90,7 +122,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     //bubble sort
     private fun bubbleSort(){
-        GlobalScope.launch (Dispatchers.Main )
+        jobBubbleSort=GlobalScope.launch (Dispatchers.Main )
         {
             var swap = true
             while (swap) {
@@ -111,7 +143,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     //selection sort
     private fun selectionSort(){
-        GlobalScope.launch (Dispatchers.Main )
+        jobSelectionSort=GlobalScope.launch (Dispatchers.Main )
         {
             var n = arrayToBeSorted.size
             var temp: Int
@@ -131,13 +163,14 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             }
         }
     }
-    //merge sort
-    private fun mergeSort(){
+    //merge sort component
+    private fun mergeSort()
+    {
 
     }
     //insertion sort
     private fun insertionSort(){
-        GlobalScope.launch (Dispatchers.Main )
+        jobInsertionSort=GlobalScope.launch (Dispatchers.Main )
         {
             for (i in 1..size) {
                 // println(items)
@@ -161,34 +194,40 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     //quick sort
     private fun quicksort(A: MutableList<Int>, p: Int, r: Int) {
-        GlobalScope.launch(Dispatchers.Main) {
+        jobQuickSort1=GlobalScope.launch(Dispatchers.Main) {
             if (p < r) {
                 var q: Int = partition(A, p, r)
                 quicksort(A, p, q - 1)
                 quicksort(A, q + 1, r)
-
             }
         }
     }
     //quick sort component
     suspend fun partition(A: MutableList<Int>, p: Int, r: Int): Int {
-        var x = A[r]
-        var i = p - 1
-        for (j in p until r) {
-            if (A[j] <= x) {
-                i++
-                exchange(A, i, j)
+        var i=0
+        jobQuickSort2=GlobalScope.launch(Dispatchers.Main) {
+            var x = A[r]
+            i = p - 1
+            for (j in p until r) {
+                if (A[j] <= x) {
+                    i++
+                    exchange(A, i, j)
+                }
             }
+            exchange(A, i + 1, r)
         }
-        exchange(A, i + 1, r)
+        jobQuickSort2.join()
         return i + 1
     }
     //quick sort component
     suspend fun exchange(A: MutableList<Int>, i: Int, j: Int) {
-        replaceTwoColInGrid(i,j)
-        var temp = A[i]
-        A[i] = A[j]
-        A[j] = temp
+        jobQuickSort3=GlobalScope.launch(Dispatchers.Main) {
+            replaceTwoColInGrid(i, j)
+            var temp = A[i]
+            A[i] = A[j]
+            A[j] = temp
+        }
+        jobQuickSort3.join()
     }
     // replaces 2 coloumn in the grid
     private suspend fun replaceTwoColInGrid(a: Int, b: Int) {
@@ -298,6 +337,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
     //seekbar function
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        cancelAllJobs()
         paintAllButtonsWhiteAgain(size)
     }
 
