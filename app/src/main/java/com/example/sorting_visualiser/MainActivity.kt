@@ -12,6 +12,7 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     lateinit var jobQuickSort2:Job
     lateinit var jobQuickSort3:Job
     lateinit var jobSelectionSort:Job
+    lateinit var jobMergeSort1:Job
+    lateinit var jobMergeSort2:Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             {
                 0 -> bubbleSort()
                 1 -> selectionSort()
-                2 -> mergeSort()
+                2 -> mergeSort(arrayToBeSorted)
                 3 -> insertionSort()
                 4 -> quicksort(arrayToBeSorted,0,size)
             }
@@ -88,6 +91,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         jobQuickSort3=GlobalScope.launch {  }
         jobInsertionSort=GlobalScope.launch {  }
         jobBubbleSort=GlobalScope.launch {  }
+        jobMergeSort1=GlobalScope.launch {  }
+        jobMergeSort2=GlobalScope.launch {  }
     }
 
     private fun cancelAllJobs() {
@@ -97,6 +102,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         jobQuickSort2.cancel()
         jobQuickSort3.cancel()
         jobSelectionSort.cancel()
+        jobMergeSort1.cancel()
+        jobMergeSort2.cancel()
     }
 
     // Menu toolbar component
@@ -164,10 +171,78 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         }
     }
     //merge sort component
-    private fun mergeSort()
-    {
-
+    fun mergeSort(list: MutableList<Int>){
+        GlobalScope.launch (Dispatchers.Main) {
+            merger(list)
+        }
     }
+    suspend fun merger(list: MutableList<Int>): MutableList<Int> {
+
+        if (list.size <= 1) {
+            return list
+        }
+        val middle = list.size / 2
+        var left = list.subList(0,middle);
+        var right = list.subList(middle,list.size);
+        var lleft:MutableList<Int> = mutableListOf()
+        var lright:MutableList<Int> = mutableListOf()
+        jobMergeSort1=GlobalScope.launch(Dispatchers.Main) {
+            lleft = merger(left)
+        }
+        jobMergeSort1.join()
+        jobMergeSort2=GlobalScope.launch(Dispatchers.Main) {
+            lright = merger(right)
+        }
+        jobMergeSort2.join()
+
+
+        var indexLeft = 0
+        var indexRight = 0
+        var newList : MutableList<Int> = mutableListOf()
+        var i=0
+        while (indexLeft < lleft.count() && indexRight < lright.count()) {
+            if (lleft[indexLeft] <= lright[indexRight]) {
+                paintSingleColWhite(i)
+                colorButton(i,lleft[indexLeft],redColor)
+                delay(200)
+                colorButton(i,lleft[indexLeft],greenColor)
+                i++
+                newList.add(lleft[indexLeft])
+                indexLeft++
+            } else {
+                paintSingleColWhite(i)
+                colorButton(i,lright[indexRight],redColor)
+                delay(200)
+                colorButton(i,lright[indexRight],greenColor)
+                i++
+                newList.add(lright[indexRight])
+                indexRight++
+            }
+        }
+
+        while (indexLeft < lleft.size) {
+            paintSingleColWhite(i)
+            colorButton(i,lleft[indexLeft],redColor)
+            delay(200)
+            colorButton(i,lleft[indexLeft],greenColor)
+            i++
+            newList.add(lleft[indexLeft])
+            indexLeft++
+        }
+
+        while (indexRight < lright.size) {
+            paintSingleColWhite(i)
+            colorButton(i,lright[indexRight],redColor)
+            delay(200)
+            colorButton(i,lright[indexRight],greenColor)
+            i++
+            newList.add(lright[indexRight])
+            indexRight++
+        }
+
+        return newList;
+    }
+
     //insertion sort
     private fun insertionSort(){
         jobInsertionSort=GlobalScope.launch (Dispatchers.Main )
